@@ -121,6 +121,10 @@ QCtablePlot <- function(Data,quality=NULL,sprep=NULL,lys=NULL,
     if(!is.null(sprep)) { 
       print ("indicators for sample prep controls"  )
       
+      # correction AP: reorder spikes in the correct order (increasing amounts)
+      col_order <- c("lys3","phe3","thr3","dap3")
+      sprep=sprep[,col_order]
+      
       # test for Lys < Phe < Thr < Dap
       t1 <- (sprep[,1]<sprep[,2] & sprep[,2]<sprep[,3] 
             & sprep[,3]<sprep[,4])       
@@ -451,6 +455,11 @@ samplePrepPlot <- function(Data,sprep=NULL,lys=NULL,plotColors=NULL,
   }
   
   if(!is.null(sprep) && !is.null(lys)) {
+    
+    # correction AP: reorder spikes in the correct order (increasing amounts)
+    col_order <- c("lys3","phe3","thr3","dap3")
+    sprep=sprep[,col_order]
+    
     #par(parStart)
     lmin<-min(sprep)
     lmax<-max(sprep)+50
@@ -1773,7 +1782,9 @@ rleFun <- function(Data, Data.pset=NULL, experimentFactor=NULL, plotColors=NULL,
 ## correlFun ##
 ###############
 
-correlFun <- function(Data, clusterOption1="pearson", clusterOption2="ward", normMeth="",
+# correction AP
+correlFun <- function(Data, clusterOption1="pearson", clusterOption2="ward.D", normMeth="",
+#correlFun <- function(Data, clusterOption1="pearson", clusterOption2="ward", normMeth="",
   experimentFactor=NULL, legendColors=NULL, WIDTH=1000, HEIGHT=1414, POINTSIZE=24,MAXARRAY=41){  
 	
   if(is.null(experimentFactor)) stop("the 'exerimentFactor' parameter is required")	
@@ -1828,6 +1839,9 @@ correlFun <- function(Data, clusterOption1="pearson", clusterOption2="ward", nor
     
     heatmap.2(crp, distfun=my.dist, hclustfun=my.hclust, trace="none", symm=TRUE, density.info="density",
               main=text1, dendrogram="row", ColSideColors=sideColors)
+    # correction AP (adding colorbar legend)
+    legend("top", title = "",legend=levels(experimentFactor), 
+           fill=legendColors, cex=0.8, box.lty=0)
 
     #correlationPlot(Data)    
     #axis(1,side=3,at=seq(from=0.5, to=(length(sampleNames(Data)))-0.5,by=1),
@@ -1845,7 +1859,9 @@ correlFun <- function(Data, clusterOption1="pearson", clusterOption2="ward", nor
 ## clusterFun ##
 ################
 
-clusterFun <- function(Data, experimentFactor=NULL, clusterOption1="pearson", clusterOption2="ward", normMeth="", 
+# correction AP
+clusterFun <- function(Data, experimentFactor=NULL, clusterOption1="pearson", clusterOption2="ward.D", normMeth="",
+#clusterFun <- function(Data, experimentFactor=NULL, clusterOption1="pearson", clusterOption2="ward", normMeth="", 
   plotColors=NULL, legendColors=NULL, plotSymbols=NULL, legendSymbols=NULL, WIDTH=1000, HEIGHT=1414, POINTSIZE=24, MAXARRAY=41) {
 
   if(is.null(experimentFactor)) stop("The 'experimentFactor' parameter must be specified")
@@ -1876,7 +1892,9 @@ clusterFun <- function(Data, experimentFactor=NULL, clusterOption1="pearson", cl
         correl <- euc(t(exprs(Data)))
       }
     )
-    clust <- hclust(correl, method = tolower(clusterOption2))
+    # correction AP
+    clust <- hclust(correl, method = clusterOption2)
+    #clust <- hclust(correl, method = tolower(clusterOption2))
     png(file = paste(Type,"DataCluster_",clusterOption1,".png",sep=""),width=WIDTH,height=HEIGHT,pointsize=POINTSIZE)
 	  if(length(sampleNames(Data))<MAXARRAY) {
 		  cexval1 <- 0.75
@@ -1969,7 +1987,9 @@ pcaFun <- function(Data, experimentFactor=NULL, normMeth="", scaled_pca=TRUE, pl
 		  if(namesInPlot) {
         if(length(levels(experimentFactor))>1){ 
           legend("topright",levels(experimentFactor),
-          pch=legendSymbols,col=legendColors,cex=cex.legend)
+          # correction AP
+          pch=18,col=legendColors,cex=cex.legend)
+          #pch=legendSymbols,col=legendColors,cex=cex.legend)
         }
       } else {
 			  par(mar=c(0,0,0,0))	
@@ -1977,8 +1997,11 @@ pcaFun <- function(Data, experimentFactor=NULL, normMeth="", scaled_pca=TRUE, pl
 			  if(length(levels(experimentFactor))>1) {
 		      legend("topleft",c(levels(experimentFactor),"",sampleNames(Data)),
  #             pch=c(rep(20,length(unique(experimentFactor))+1),plotSymbols,
-			      pch=c(legendSymbols,20,plotSymbols),
-		          col=c(legendColors,"white",plotColors),cex=(cex.legend+0.1)
+            # correction AP
+            pch=c(rep(18,length(unique(experimentFactor))),20,plotSymbols),
+               col=c(legendColors,"white",plotColors),cex=(cex.legend+0.1)
+			      #pch=c(legendSymbols,20,plotSymbols),
+		        #  col=c(legendColors,"white",plotColors),cex=(cex.legend+0.1)
  #             ,fill=c(legendColors,rep("white",length(experimentFactor)+1)),
  #             border=c(legendColors,rep("white",length(experimentFactor)+1))
 			    )
